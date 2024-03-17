@@ -35,9 +35,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // Change this to how you wired your keyboard
 // COLS: Left to right, ROWS: Top to bottom
-#define MATRIX_ROW_PINS { D1, D0, D4, C6 }
+#define MATRIX_ROW_PINS { B3, B2, B4, E6 }
                        // P16 P9  P8  P7  P6  P14 P10 P15 P18 P19 P20 P21
-#define MATRIX_COL_PINS { B2, B5, B4, E6, D7, B3, B6, B1, F7, F6, F5, F4 }
+#define MATRIX_COL_PINS { D1, D0, D4, C6, D7, B5, B6, B1, F7, F6, F5, F4 }
 #define UNUSED_PINS
 
 /* COL2ROW or ROW2COL */
