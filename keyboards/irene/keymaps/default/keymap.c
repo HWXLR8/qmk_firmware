@@ -1,5 +1,8 @@
 #include "irene.h"
 
+#include "i2c.h"
+#include "lcd.h"
+
 // Each layer gets a name for readability, which is then used in the keymap matrix below.
 // The underscores don't mean anything - you can have a layer called STUFF or any other name.
 // Layer names don't all need to be of the same length, obviously, and you can also skip them
@@ -62,3 +65,28 @@ const macro_t *action_get_macro(keyrecord_t *record, uint8_t id, uint8_t opt)
       }
     return MACRO_NONE;
 };
+
+void matrix_init_user(void){
+    lcd_init(LCD_DISP_ON);
+    lcd_clrscr();
+    lcd_puts("Irene's keyboard");
+    lcd_gotoxy(0,2);
+    lcd_puts_p(PSTR("(~^o^)~"));
+    #ifdef GRAPHICMODE
+    lcd_drawCircle(64,32,7,WHITE);
+    lcd_display();
+    #endif
+    return;
+}
+
+void matrix_scan_user(void){
+   lcd_clrscr();
+   lcd_puts("Irene's Keyboard");
+   lcd_gotoxy(0,2);
+   lcd_puts_p(PSTR("     ~(^o^~)"));
+#ifdef GRAPHICMODE
+   lcd_drawCircle(64,32,7,WHITE);
+   lcd_display();
+#endif
+   return;
+}
