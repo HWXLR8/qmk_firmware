@@ -84,3 +84,4 @@ SRC = i2c.c \
 
 USE_I2C = yes
 CFLAGS += -Wno-unknown-pragmas
+CFLAGS += -Wno-error=maybe-uninitialized
