@@ -75,5 +75,13 @@ NKRO_ENABLE = yes		# USB Nkey Rollover - not yet supported in LUFA
 # MIDI_ENABLE = YES 		# MIDI controls
 UNICODE_ENABLE = YES 		# Unicode
 # BLUETOOTH_ENABLE = yes # Enable Bluetooth with the Adafruit EZ-Key HID
+OLED_ENABLE = yes
 
 USB = /dev/cu.usbmodem1411
+
+SRC = i2c.c \
+	  lcd.c
+
+USE_I2C = yes
+CFLAGS += -Wno-unknown-pragmas
+CFLAGS += -Wno-error=maybe-uninitialized
