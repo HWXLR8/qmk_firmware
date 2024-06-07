@@ -10,7 +10,8 @@
 #define _QW 0
 #define _RS 1
 #define _LW 2
-bool lcd_off = false;
+static bool lcd_off = false;
+int i = 0;
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 [_QW] = KEYMAP( /* Qwerty */
@@ -65,49 +66,74 @@ const macro_t *action_get_macro(keyrecord_t *record, uint8_t id, uint8_t opt)
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
         case MO(_RS):
-	    if (record->event.pressed) {
-    	        lcd_clrscr();
- 	        lcd_puts("Layer 2");
-	    }
-	    else {
-		lcd_clrscr();
-		lcd_puts("Layer 1((((((((((((((((");
-	    }
-	    return true;
-	case TG(_LW):
-	    lcd_clrscr();
-	    lcd_puts("Layer 3");
-	    return true;
 	case TO(_QW):
-	    lcd_clrscr();
-	    lcd_puts("Layer 1");
-	    return true;
-	case KC_NO:
-	    if (lcd_off) {
-	    	lcd_init(LCD_DISP_ON);
-	        lcd_off = false;
+	    if (record->event.pressed) {
+		if (i == 2)
+		    i = 0;
+		else
+		    i++;
 	    }
 	    else {
-		lcd_clrscr();
-		lcd_sleep(YES);
-		lcd_off = true;
+		if ((i != 2) && (i != 0))
+		    i--;
+	    }
+	    break;
+	case TG(_LW):
+	    if (record->event.pressed) {
+	    	i++;
+	    }
+	    break;
+	case KC_NO:
+	    if (record->event.pressed) {
+	    	if (lcd_off) {
+	    	    lcd_init(LCD_DISP_ON);
+		    lcd_clrscr();
+		    lcd_puts("LCD ON");
+	            lcd_off = false;
+	    	}
+	    	else {
+		    lcd_clrscr();
+		    lcd_sleep(YES);
+		    lcd_off = true;
+	    	}
 	    }
 	    return true;
 	default:
 	    return true;
     }
-}
-/*
-void post_process_record_user(uint16_t keycode, keyrecord_t *record){
-    switch (keycode) {
-        case MO(_RS):
-	    lcd_clrscr();
-	    lcd_puts("Layer 1");
-	default:
-	    return;
+    if (!lcd_off){	
+    	switch(i){
+	    case 0:
+	    	lcd_clrscr();
+	    	lcd_puts("Layer 1");
+		lcd_gotoxy(0,2);
+		lcd_puts_p(PSTR("QWERTY"));
+		lcd_gotoxy(0,4);
+		lcd_puts_p(PSTR("(> v <)"));
+	    	break;
+	    case 1:
+	    	lcd_clrscr();
+	    	lcd_puts("Layer 2");
+		lcd_gotoxy(0,2);
+		lcd_puts_p(PSTR("Functions & Symbols"));
+		lcd_gotoxy(0,4);
+		lcd_puts_p(PSTR("(O_o)?"));
+	    	break;
+	    case 2:
+	    	lcd_clrscr();
+	    	lcd_puts("Layer 3");
+		lcd_gotoxy(0,2);
+		lcd_puts_p(PSTR("Number Pad"));
+		lcd_gotoxy(0,4);
+		lcd_puts_p(PSTR("(-_-;)"));
+	    	break;
+	    default:
+	    	break;
+        }
     }
+    return true;
 }
-*/
+
 void matrix_init_user(void){
     lcd_init(LCD_DISP_ON);
     lcd_clrscr();
