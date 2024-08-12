@@ -52,118 +52,118 @@ const uint16_t PROGMEM fn_actions[] = {
 
 const macro_t *action_get_macro(keyrecord_t *record, uint8_t id, uint8_t opt)
 {
-  // MACRODOWN only works in this function
-      switch(id) {
+    // MACRODOWN only works in this function
+    switch(id) {
         case 0:
-          if (record->event.pressed) {
-            register_code(KC_RSFT);
-          } else {
-            unregister_code(KC_RSFT);
-          }
-        break;
-      }
+            if (record->event.pressed) {
+                register_code(KC_RSFT);
+            } else {
+                unregister_code(KC_RSFT);
+            }
+            break;
+    }
     return MACRO_NONE;
 };
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-	if ((record->event.pressed) && (idle_mode == 1)) {
-		idle_mode = 0;
-		timer_loop = 0;
-		lcd_clrscr();
-		timer1_stop();
-	}
+    if ((record->event.pressed) && (idle_mode == 1)) {
+        idle_mode = 0;
+        timer_loop = 0;
+        lcd_clrscr();
+        timer1_stop();
+    }
 
     switch (keycode) {
         case MO(_RS):
-		case TO(_QW):
-			if (record->event.pressed) {
-			if (i == 2)
-				i = 0;
-			else
-				i++;
-			}
-			else {
-			if ((i != 2) && (i != 0))
-				i--;
-			}
-			break;
-		case TG(_LW):
-			if (record->event.pressed) {
-				i++;
-			}
-			break;
-		case KC_NO:
-			if (record->event.pressed) {
-				if (lcd_off) {
-					lcd_init(LCD_DISP_ON);
-				lcd_clrscr();
-				lcd_puts("LCD ON");
-					lcd_off = false;
-				}
-				else {
-				lcd_clrscr();
-				lcd_sleep(YES);
-				lcd_off = true;
-				}
-			}
-			return true;
-		case KC_F13:
-			if (record->event.pressed) {
-				if (idle_mode == 0) {
-					idle_mode = 1;
-				}
-			}
-			break;
-		default:
-			return true;
+        case TO(_QW):
+            if (record->event.pressed) {
+                if (i == 2)
+                    i = 0;
+                else
+                    i++;
+            }
+            else {
+                if ((i != 2) && (i != 0))
+                    i--;
+            }
+            break;
+        case TG(_LW):
+            if (record->event.pressed) {
+                i++;
+            }
+            break;
+        case KC_NO:
+            if (record->event.pressed) {
+                if (lcd_off) {
+                    lcd_init(LCD_DISP_ON);
+                    lcd_clrscr();
+                    lcd_puts("LCD ON");
+                    lcd_off = false;
+                }
+                else {
+                    lcd_clrscr();
+                    lcd_sleep(YES);
+                    lcd_off = true;
+                }
+            }
+            return true;
+        case KC_F13:
+            if (record->event.pressed) {
+                if (idle_mode == 0) {
+                    idle_mode = 1;
+                }
+            }
+            break;
+        default:
+            return true;
     }
     if (!lcd_off){	
-		if (idle_mode == 1) {
-			lcd_clrscr();
-			lcd_puts("Fishing...");
-			lcd_gotoxy(0,2);
-			lcd_puts_p(PSTR("     ><(((*>"));
-			lcd_gotoxy(0,4);
-			lcd_puts_p(PSTR("          <*)))><"));
-			return true;
-		}
-    	switch(i){
-			case 0:
-				lcd_clrscr();
-				lcd_puts("Layer 1");
-				lcd_gotoxy(0,2);
-				lcd_puts_p(PSTR("QWERTY"));
-				lcd_gotoxy(0,4);
-				lcd_puts_p(PSTR("(> v <)"));
-				break;
-			case 1:
-				lcd_clrscr();
-				lcd_puts("Layer 2");
-				lcd_gotoxy(0,2);
-				lcd_puts_p(PSTR("Functions & Symbols"));
-				lcd_gotoxy(0,4);
-				lcd_puts_p(PSTR("(O_o)?"));
-				break;
-			case 2:
-				lcd_clrscr();
-				lcd_puts("Layer 3");
-				lcd_gotoxy(0,2);
-				lcd_puts_p(PSTR("Number Pad"));
-				lcd_gotoxy(0,4);
-				lcd_puts_p(PSTR("(-_-;)"));
-				break;
-			default:
-				break;
+        if (idle_mode == 1) {
+            lcd_clrscr();
+            lcd_puts("Fishing...");
+            lcd_gotoxy(0,2);
+            lcd_puts_p(PSTR("     ><(((*>"));
+            lcd_gotoxy(0,4);
+            lcd_puts_p(PSTR("          <*)))><"));
+            return true;
+        }
+        switch(i){
+            case 0:
+                lcd_clrscr();
+                lcd_puts("Layer 1");
+                lcd_gotoxy(0,2);
+                lcd_puts_p(PSTR("QWERTY"));
+                lcd_gotoxy(0,4);
+                lcd_puts_p(PSTR("(> v <)"));
+                break;
+            case 1:
+                lcd_clrscr();
+                lcd_puts("Layer 2");
+                lcd_gotoxy(0,2);
+                lcd_puts_p(PSTR("Functions & Symbols"));
+                lcd_gotoxy(0,4);
+                lcd_puts_p(PSTR("(O_o)?"));
+                break;
+            case 2:
+                lcd_clrscr();
+                lcd_puts("Layer 3");
+                lcd_gotoxy(0,2);
+                lcd_puts_p(PSTR("Number Pad"));
+                lcd_gotoxy(0,4);
+                lcd_puts_p(PSTR("(-_-;)"));
+                break;
+            default:
+                break;
         }
     }
     return true;
 }
 
 void press_random(void) {
-	uint8_t key = rand() % 5;
-	uint8_t key_list[5] = {KC_F13, KC_F14, KC_F15, KC_F16, KC_F17};
-	register_code(key_list[key]);
-	unregister_code(key_list[key]);
+    uint8_t key = rand() % 5;
+    uint8_t key_list[5] = {KC_F13, KC_F14, KC_F15, KC_F16, KC_F17};
+    register_code(key_list[key]);
+    unregister_code(key_list[key]);
 }
 
 void matrix_init_user(void){
@@ -176,30 +176,30 @@ void matrix_init_user(void){
     lcd_drawCircle(64,32,7,WHITE);
     lcd_display();
     #endif
-   
+
     timer1_init();
     return;
 }
 
 void matrix_scan_user(void){
-	if (idle_mode == 1) {
-		if ((TIFR1 & (1<<OCF1A)) != 0) {
-			if (timer_loop >= 60) {
-				timer_loop = 0;
-				PORTB ^= (1 << PINB0);
-				press_random();
-			}
-			else{
-				timer_loop += 1;
-			}
-			TCNT1 = 0;
-			TIFR1 |= (1<<OCF1A); // Clear overflow flag
-		}
-	}
-	else {
-		timer1_stop();
-		timer_loop = 0;
-	}
+    if (idle_mode == 1) {
+        if ((TIFR1 & (1<<OCF1A)) != 0) {
+            if (timer_loop >= 60) {
+                timer_loop = 0;
+                PORTB ^= (1 << PINB0);
+                press_random();
+            }
+            else{
+                timer_loop += 1;
+            }
+            TCNT1 = 0;
+            TIFR1 |= (1<<OCF1A); // Clear overflow flag
+        }
+    }
+    else {
+        timer1_stop();
+        timer_loop = 0;
+    }
 
-   	return;
+    return;
 }
