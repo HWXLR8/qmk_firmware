@@ -11,7 +11,7 @@
 #define _RS 1
 #define _LW 2
 static bool lcd_off = false;
-int i = 0;
+int keyboard_layer = 0;
 int idle_mode = 0;
 int timer_loop = 0;
 
@@ -22,12 +22,12 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   KC_A,    KC_S,    KC_D,    KC_F,    KC_G,                 KC_H,    KC_J,    KC_K,    KC_L,    KC_SLSH ,
   KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,                 KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_ENT  ,
   KC_ESC,  KC_LGUI, KC_LSFT, KC_BSPC, SCMD(KC_S),           KC_DEL, KC_SPC,  MO(_RS),  KC_SCLN, KC_QUOT , 
-                                      MT(MOD_LCTL, KC_TAB), MT(MOD_LALT, KC_CAPS)                                                     ),
+                                      MT(MOD_LCTL, KC_TAB), MT(MOD_LALT, KC_CAPS)                       ),
 
 [_RS] = KEYMAP( /* [> RAISE <] */
-  KC_GRV,     KC_F10,    KC_F11,    KC_F12,    KC_PSCR,    KC_NO,    KC_NO,    KC_NO,     KC_MINS, KC_EQL,
+  KC_GRV,     KC_F10,    KC_F11,    KC_F12,    KC_PSCR,    KC_NO,    KC_NO,    KC_NO,     KC_MINS, KC_EQL  ,
   KC_VOLU,    KC_F7,     KC_F8,     KC_F9,     KC_SLCK,    KC_PGUP,  KC_INS,   KC_UP,     KC_LBRC, KC_RBRC ,
-  KC_VOLD,    KC_F4,     KC_F5,     KC_F6,     KC_PAUS,    KC_PGDN,  KC_LEFT,  KC_DOWN,   KC_RGHT, KC_SLSH,
+  KC_VOLD,    KC_F4,     KC_F5,     KC_F6,     KC_PAUS,    KC_PGDN,  KC_LEFT,  KC_DOWN,   KC_RGHT, KC_SLSH ,
   KC_MUTE,    KC_F1,     KC_F2,     KC_F3,     KC_CAPS,    KC_HOME,  KC_END,   KC_COMM,   KC_DOT,  KC_BSLS ,
   TG(_LW),    KC_LGUI,   KC_LSFT,   KC_BSPC,   KC_RCTL,    KC_DEL,   KC_SPC,   KC_TRNS,   KC_SCLN, KC_QUOT ,         
                                                KC_LCTL,    KC_LALT                        ),
@@ -38,11 +38,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  *       voldn  super shift bksp ctrl || alt space   L0  prtsc scroll pause
  */
 [_LW] = KEYMAP( /* [> LOWER <] */
-  KC_F13,    KC_NO,    KC_NO,    KC_NO,    KC_NO,    KC_NO,    KC_NO,    KC_NO,    KC_BSLS,    KC_ASTR    ,
+  KC_F13,   KC_NO,    KC_NO,    KC_NO,    KC_NO,    KC_NO,    KC_NO,    KC_NO,    KC_BSLS,    KC_ASTR  ,
   KC_NO,    KC_NO,    KC_W,     KC_NO,    KC_NO,    KC_NO,    KC_7,     KC_8,     KC_9,       KC_MINS  ,
   KC_NO,    KC_A,     KC_S,     KC_D,     KC_NO,    KC_NO,    KC_4,     KC_5,     KC_6,       KC_PLUS  ,
-  KC_NO,    KC_NO,    KC_NO,    KC_NO,    KC_NO,    KC_NO,    KC_1,     KC_2,     KC_3,       KC_ENT  ,
-  KC_NO,    KC_LGUI,  KC_LSFT,  KC_BSPC,  RESET,    KC_NO,    KC_SPC,   TO(_QW),  KC_0,       KC_DOT ,
+  KC_NO,    KC_NO,    KC_NO,    KC_NO,    KC_NO,    KC_NO,    KC_1,     KC_2,     KC_3,       KC_ENT   ,
+  KC_NO,    KC_LGUI,  KC_LSFT,  KC_BSPC,  RESET,    KC_NO,    KC_SPC,   TO(_QW),  KC_0,       KC_DOT   ,
                                           KC_LCTL,  KC_LALT         )
 };
 
@@ -66,6 +66,7 @@ const macro_t *action_get_macro(keyrecord_t *record, uint8_t id, uint8_t opt)
 };
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    // Exit idle mode and stop timer once it detects key press
     if ((record->event.pressed) && (idle_mode == 1)) {
         idle_mode = 0;
         timer_loop = 0;
@@ -73,25 +74,41 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         timer1_stop();
     }
 
+    /*
+    Keyboard Layer Logic:
+        Layer 0 (default)
+        Layer 1:
+            Triggered by holding MO(_RS)
+        Layer 2:
+            Triggered by TG(_LW) in layer 1
+            Exit upon TO(_QW)
+    */
     switch (keycode) {
         case MO(_RS):
         case TO(_QW):
             if (record->event.pressed) {
-                if (i == 2)
-                    i = 0;
-                else
-                    i++;
+                // 
+                if (keyboard_layer == 2) {
+                    keyboard_layer = 0;
+                }
+                else {
+                    keyboard_layer++;
+                }
             }
             else {
-                if ((i != 2) && (i != 0))
-                    i--;
+                // Return to layer 0 upon layer 1 release
+                if ((keyboard_layer != 2) && (keyboard_layer != 0)) {
+                    keyboard_layer--;
+                }
             }
             break;
         case TG(_LW):
             if (record->event.pressed) {
-                i++;
+                keyboard_layer++;
             }
             break;
+
+        // Use KC_NO to toggle lcd on/off
         case KC_NO:
             if (record->event.pressed) {
                 if (lcd_off) {
@@ -107,6 +124,8 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 }
             }
             return true;
+
+        // Use F13 to toggle idle mode
         case KC_F13:
             if (record->event.pressed) {
                 if (idle_mode == 0) {
@@ -114,10 +133,13 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 }
             }
             break;
+
         default:
             return true;
     }
+
     if (!lcd_off){	
+        // Display Idle mode graphics
         if (idle_mode == 1) {
             lcd_clrscr();
             lcd_puts("Fishing...");
@@ -127,7 +149,9 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             lcd_puts_p(PSTR("          <*)))><"));
             return true;
         }
-        switch(i){
+
+        // Display the current keyboard layer on LCD
+        switch(keyboard_layer){
             case 0:
                 lcd_clrscr();
                 lcd_puts("Layer 1");
@@ -159,7 +183,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     return true;
 }
 
-void press_random(void) {
+void send_random_benign_keystroke(void) {
     uint8_t key = rand() % 5;
     uint8_t key_list[5] = {KC_F13, KC_F14, KC_F15, KC_F16, KC_F17};
     register_code(key_list[key]);
@@ -183,16 +207,22 @@ void matrix_init_user(void){
 
 void matrix_scan_user(void){
     if (idle_mode == 1) {
+        // Timer overflow when Output Compare flag (OCF1A) of Timer1 
+        // Interrupt Flag Register (TIFR1) is set
         if ((TIFR1 & (1<<OCF1A)) != 0) {
+            // Send benign keystroke after 60 instances of time up (60 seconds)
             if (timer_loop >= 60) {
                 timer_loop = 0;
+                #ifdef IDLEDEBUG
                 PORTB ^= (1 << PINB0);
-                press_random();
+                #endif
+                send_random_benign_keystroke();
             }
             else{
                 timer_loop += 1;
             }
-            TCNT1 = 0;
+            // Reset Timer
+            TCNT1 = 0; // Reset timer register
             TIFR1 |= (1<<OCF1A); // Clear overflow flag
         }
     }

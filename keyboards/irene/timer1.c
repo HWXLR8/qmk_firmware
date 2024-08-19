@@ -1,7 +1,9 @@
 #include "timer1.h"
 
 void timer1_init(void){
+    #ifdef IDLEDEBUG
     DDRB |= (1 << PINB0);
+    #endif
 
     // Start the timer with prescaler 1024 (16MHz CLK)
     TCCR1B |= (1<<CS10) | (1<<CS12);
@@ -14,7 +16,7 @@ void timer1_init(void){
 };
 
 void timer1_stop(void){
-    TCNT1 = 0;
+    TCNT1 = 0; // Reset timer register
     TIFR1 |= (1<<OCF1A); // Clear overflow flag
     return;
 };
