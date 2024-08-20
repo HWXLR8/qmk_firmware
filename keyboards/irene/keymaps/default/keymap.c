@@ -86,8 +86,8 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
         case MO(_RS):
         case TO(_QW):
+            // Increment layer upon MO(_RS) keypress, return to 0 upon TO(_QW)
             if (record->event.pressed) {
-                // 
                 if (keyboard_layer == 2) {
                     keyboard_layer = 0;
                 }
@@ -103,6 +103,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             }
             break;
         case TG(_LW):
+            // Increment layer so that TF(_LW) keypress triggers layer 2
             if (record->event.pressed) {
                 keyboard_layer++;
             }
@@ -192,7 +193,6 @@ void send_random_benign_keystroke(void) {
 
 void matrix_init_user(void){
     lcd_init(LCD_DISP_ON);
-    lcd_clrscr();
     lcd_puts("Irene's keyboard");
     lcd_gotoxy(0,2);
     lcd_puts_p(PSTR("(~^o^)~"));
