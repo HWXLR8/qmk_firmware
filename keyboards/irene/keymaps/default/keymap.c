@@ -53,21 +53,27 @@ const uint16_t PROGMEM fn_actions[] = {
 const macro_t *action_get_macro(keyrecord_t *record, uint8_t id, uint8_t opt)
 {
     // MACRODOWN only works in this function
-    switch(id) {
-        case 0:
-            if (record->event.pressed) {
-                register_code(KC_RSFT);
-            } else {
-                unregister_code(KC_RSFT);
-            }
-            break;
+    switch (id)
+    {
+    case 0:
+        if (record->event.pressed)
+        {
+            register_code(KC_RSFT);
+        }
+        else
+        {
+            unregister_code(KC_RSFT);
+        }
+        break;
     }
     return MACRO_NONE;
 };
 
-bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+bool process_record_user(uint16_t keycode, keyrecord_t *record)
+{
     // Exit idle mode and stop timer once it detects key press
-    if ((record->event.pressed) && (idle_mode == 1)) {
+    if ((record->event.pressed) && (idle_mode == 1))
+    {
         idle_mode = 0;
         timer_loop = 0;
         lcd_clrscr();
@@ -83,150 +89,173 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             Triggered by TG(_LW) in layer 1
             Exit upon TO(_QW)
     */
-    switch (keycode) {
-        case MO(_RS):
-        case TO(_QW):
-            // Increment layer upon MO(_RS) keypress, return to 0 upon TO(_QW)
-            if (record->event.pressed) {
-                if (keyboard_layer == 2) {
-                    keyboard_layer = 0;
-                }
-                else {
-                    keyboard_layer++;
-                }
+    switch (keycode)
+    {
+    case MO(_RS):
+    case TO(_QW):
+        // Increment layer upon MO(_RS) keypress, return to 0 upon TO(_QW)
+        if (record->event.pressed)
+        {
+            if (keyboard_layer == 2)
+            {
+                keyboard_layer = 0;
             }
-            else {
-                // Return to layer 0 upon layer 1 release
-                if ((keyboard_layer != 2) && (keyboard_layer != 0)) {
-                    keyboard_layer--;
-                }
-            }
-            break;
-        case TG(_LW):
-            // Increment layer so that TF(_LW) keypress triggers layer 2
-            if (record->event.pressed) {
+            else
+            {
                 keyboard_layer++;
             }
-            break;
-
-        // Use KC_NO to toggle lcd on/off
-        case KC_NO:
-            if (record->event.pressed) {
-                if (lcd_off) {
-                    lcd_init(LCD_DISP_ON);
-                    lcd_clrscr();
-                    lcd_puts("LCD ON");
-                    lcd_off = false;
-                }
-                else {
-                    lcd_clrscr();
-                    lcd_sleep(YES);
-                    lcd_off = true;
-                }
+        }
+        else
+        {
+            // Return to layer 0 upon layer 1 release
+            if ((keyboard_layer != 2) && (keyboard_layer != 0))
+            {
+                keyboard_layer--;
             }
-            return true;
+        }
+        break;
+    case TG(_LW):
+        // Increment layer so that TF(_LW) keypress triggers layer 2
+        if (record->event.pressed)
+        {
+            keyboard_layer++;
+        }
+        break;
 
-        // Use F13 to toggle idle mode
-        case KC_F13:
-            if (record->event.pressed) {
-                if (idle_mode == 0) {
-                    idle_mode = 1;
-                }
+    // Use KC_NO to toggle lcd on/off
+    case KC_NO:
+        if (record->event.pressed)
+        {
+            if (lcd_off)
+            {
+                lcd_init(LCD_DISP_ON);
+                lcd_clrscr();
+                lcd_puts("LCD ON");
+                lcd_off = false;
             }
-            break;
+            else
+            {
+                lcd_clrscr();
+                lcd_sleep(YES);
+                lcd_off = true;
+            }
+        }
+        return true;
 
-        default:
-            return true;
+    // Use F13 to toggle idle mode
+    case KC_F13:
+        if (record->event.pressed)
+        {
+            if (idle_mode == 0)
+            {
+                idle_mode = 1;
+            }
+        }
+        break;
+
+    default:
+        return true;
     }
 
-    if (!lcd_off){	
+    if (!lcd_off)
+    {
         // Display Idle mode graphics
-        if (idle_mode == 1) {
+        if (idle_mode == 1)
+        {
             lcd_clrscr();
             lcd_puts("Fishing...");
-            lcd_gotoxy(0,2);
+            lcd_gotoxy(0, 2);
             lcd_puts_p(PSTR("     ><(((*>"));
-            lcd_gotoxy(0,4);
+            lcd_gotoxy(0, 4);
             lcd_puts_p(PSTR("          <*)))><"));
             return true;
         }
 
         // Display the current keyboard layer on LCD
-        switch(keyboard_layer){
-            case 0:
-                lcd_clrscr();
-                lcd_puts("Layer 1");
-                lcd_gotoxy(0,2);
-                lcd_puts_p(PSTR("QWERTY"));
-                lcd_gotoxy(0,4);
-                lcd_puts_p(PSTR("(> v <)"));
-                break;
-            case 1:
-                lcd_clrscr();
-                lcd_puts("Layer 2");
-                lcd_gotoxy(0,2);
-                lcd_puts_p(PSTR("Functions & Symbols"));
-                lcd_gotoxy(0,4);
-                lcd_puts_p(PSTR("(O_o)?"));
-                break;
-            case 2:
-                lcd_clrscr();
-                lcd_puts("Layer 3");
-                lcd_gotoxy(0,2);
-                lcd_puts_p(PSTR("Number Pad"));
-                lcd_gotoxy(0,4);
-                lcd_puts_p(PSTR("(-_-;)"));
-                break;
-            default:
-                break;
+        switch (keyboard_layer)
+        {
+        case 0:
+            lcd_clrscr();
+            lcd_puts("Layer 1");
+            lcd_gotoxy(0, 2);
+            lcd_puts_p(PSTR("QWERTY"));
+            lcd_gotoxy(0, 4);
+            lcd_puts_p(PSTR("(> v <)"));
+            break;
+        case 1:
+            lcd_clrscr();
+            lcd_puts("Layer 2");
+            lcd_gotoxy(0, 2);
+            lcd_puts_p(PSTR("Functions & Symbols"));
+            lcd_gotoxy(0, 4);
+            lcd_puts_p(PSTR("(O_o)?"));
+            break;
+        case 2:
+            lcd_clrscr();
+            lcd_puts("Layer 3");
+            lcd_gotoxy(0, 2);
+            lcd_puts_p(PSTR("Number Pad"));
+            lcd_gotoxy(0, 4);
+            lcd_puts_p(PSTR("(-_-;)"));
+            break;
+        default:
+            break;
         }
     }
     return true;
 }
 
-void send_random_benign_keystroke(void) {
+void send_random_benign_keystroke(void)
+{
     uint8_t key = rand() % 5;
     uint8_t key_list[5] = {KC_F13, KC_F14, KC_F15, KC_F16, KC_F17};
     register_code(key_list[key]);
     unregister_code(key_list[key]);
 }
 
-void matrix_init_user(void){
+void matrix_init_user(void)
+{
     lcd_init(LCD_DISP_ON);
     lcd_puts("Irene's keyboard");
-    lcd_gotoxy(0,2);
+    lcd_gotoxy(0, 2);
     lcd_puts_p(PSTR("(~^o^)~"));
-    #ifdef GRAPHICMODE
-    lcd_drawCircle(64,32,7,WHITE);
+#ifdef GRAPHICMODE
+    lcd_drawCircle(64, 32, 7, WHITE);
     lcd_display();
-    #endif
+#endif
 
     timer1_init();
     return;
 }
 
-void matrix_scan_user(void){
-    if (idle_mode == 1) {
-        // Timer overflow when Output Compare flag (OCF1A) of Timer1 
+void matrix_scan_user(void)
+{
+    if (idle_mode == 1)
+    {
+        // Timer overflow when Output Compare flag (OCF1A) of Timer1
         // Interrupt Flag Register (TIFR1) is set
-        if ((TIFR1 & (1<<OCF1A)) != 0) {
+        if ((TIFR1 & (1 << OCF1A)) != 0)
+        {
             // Send benign keystroke after 60 instances of time up (60 seconds)
-            if (timer_loop >= 60) {
+            if (timer_loop >= 60)
+            {
                 timer_loop = 0;
-                #ifdef IDLEDEBUG
+#ifdef IDLEDEBUG
                 PORTB ^= (1 << PINB0);
-                #endif
+#endif
                 send_random_benign_keystroke();
             }
-            else{
+            else
+            {
                 timer_loop += 1;
             }
             // Reset Timer
-            TCNT1 = 0; // Reset timer register
-            TIFR1 |= (1<<OCF1A); // Clear overflow flag
+            TCNT1 = 0;             // Reset timer register
+            TIFR1 |= (1 << OCF1A); // Clear overflow flag
         }
     }
-    else {
+    else
+    {
         timer1_stop();
         timer_loop = 0;
     }
