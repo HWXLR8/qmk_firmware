@@ -80,7 +80,8 @@ OLED_ENABLE = yes
 USB = /dev/cu.usbmodem1411
 
 SRC = i2c.c \
-	  lcd.c
+      lcd.c \
+      timer1.c
 
 USE_I2C = yes
 CFLAGS += -Wno-unknown-pragmas
