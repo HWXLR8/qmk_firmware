@@ -1,4 +1,4 @@
-#include "niubkb.h"
+#include "niubkb_v2.h"
 
 void matrix_init_kb(void) {
     matrix_init_user();
