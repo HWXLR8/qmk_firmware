@@ -1,5 +1,5 @@
 /*
-Copyright 2024 HWXLR5
+Copyright 2025 HWXLR8
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -22,12 +22,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /* USB Device descriptor parameter */
 
-#define VENDOR_ID       0xDEAD
-#define PRODUCT_ID      0xBEEF
-#define DEVICE_VER      0x0002
-#define MANUFACTURER    SEGV
-#define PRODUCT         牛逼KB
-#define DESCRIPTION     QMK FW for 牛逼KB
+#define VENDOR_ID       0x046D
+#define PRODUCT_ID      0xC31C
+#define DEVICE_VER      0x6400
+#define MANUFACTURER    Logitech
+#define PRODUCT         USB Keyboard
 
 /* key matrix size */
 #define MATRIX_ROWS 4
