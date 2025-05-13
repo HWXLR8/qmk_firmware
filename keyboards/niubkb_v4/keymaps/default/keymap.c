@@ -111,45 +111,49 @@ void matrix_init_user(void) {
     return;
 }
 
-#define ENCODER_PIN_A PIND2
-#define ENCODER_PIN_B PIND3
+#define ENCODER_PIN_A PIND3
+#define ENCODER_PIN_B PIND2
 static uint8_t prev_state = 0;
 static int8_t encoder_position = 0;
+static int8_t last_direction = 0;  // 1 for CW, -1 for CCW
 
 void matrix_scan_user(void)
 {
-    // Read the encoder pins
     uint8_t a = (PIND & (1 << ENCODER_PIN_A)) ? 1 : 0;
     uint8_t b = (PIND & (1 << ENCODER_PIN_B)) ? 1 : 0;
 
     uint8_t current_state = (a << 1) | b;
 
-    // If there's a state change, figure out the direction and increment/decrement
     if (current_state != prev_state) {
-        // Clockwise direction (A leads B)
+        int8_t direction = 0;
+
         if ((prev_state == 0b00 && current_state == 0b01) ||
             (prev_state == 0b01 && current_state == 0b11) ||
             (prev_state == 0b11 && current_state == 0b10) ||
             (prev_state == 0b10 && current_state == 0b00)) {
-            encoder_position++;
-        }
-        // Counter-clockwise direction (B leads A)
-        else {
-            encoder_position--;
+            direction = 1;  // clockwise
+        } else {
+            direction = -1; // counter-clockwise
         }
 
-        // Trigger action after one full detent (4 steps)
+        encoder_position if direction changed
+        if (direction != last_direction && encoder_position != 0) {
+            encoder_position = 0;
+        }
+
+        encoder_position += direction;
+        last_direction = direction;
+
         if (encoder_position >= 4) {
             encoder_position = 0;
-            register_code(KC_A);  // Clockwise
-            unregister_code(KC_A);
+            register_code(KC_AUDIO_VOL_UP);
+            unregister_code(KC_AUDIO_VOL_UP);
         } else if (encoder_position <= -4) {
             encoder_position = 0;
-            register_code(KC_B);  // Counter-clockwise
-            unregister_code(KC_B);
+            register_code(KC_AUDIO_VOL_DOWN);
+            unregister_code(KC_AUDIO_VOL_DOWN);
         }
 
-        // Update the previous state for the next cycle
         prev_state = current_state;
     }
 
